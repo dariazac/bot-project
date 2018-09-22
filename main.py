@@ -39,10 +39,24 @@ class Tasker:
     def __init__(self, t_action, t_obj):  # setting attributes in dunder init
         self.t_action = t_action
         self.t_obj = t_obj
-        self.task = t_action + ' ' + t_obj
+        # self.task = t_action + ' ' + t_obj
 
         Tasker.t_count += 1  # num of projects
         # print("\ninicialised ", self.task)  # PRINT TEST
+
+    @property
+    def task(self):
+        return '{} {}'.format(self.t_action, self.t_obj)
+
+    @task.setter
+    def task(self, action):
+        self.t_action, self.t_obj = action.split(' ')
+
+    @task.deleter
+    def task(self):
+        print('Delete Name!')
+        self.t_action = None
+        self.t_obj = None
 
     def nowtime(self):  # method must take in the instance 'self'
         return time.strftime("%Y-%m-%d %H:%M:%S", ts)
@@ -133,10 +147,15 @@ bot_1 = Project("build", "a bot")
 groceries = Tasker("get", "groceries")
 print(groceries.task, groceries.t_dur)
 
-dishes = Tasker("clean", "dishes")
-print(dishes.task, dishes.t_dur)
+# groceries.task = 'bike food'
+del groceries.task
 
-print(groceries + dishes)
+print(groceries.task, groceries.t_dur)
+
+dishes = Tasker("clean", "dishes")
+# print(dishes.task, dishes.t_dur)
+
+# print(groceries + dishes)
 
 # prj_1 = Project('do', 'something', [dishes])
 # print(prj_1.task)
