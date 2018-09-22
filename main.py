@@ -32,48 +32,50 @@ my_date = datetime.date(y, m, d)
 # new class Project
 
 
-class Project:
-    p_count = 0
-    p_dur = 5
+class Tasker:
+    t_count = 0
+    t_dur = 0.5
 
-    def __init__(self, p_name, p_location, p_notes):  # setting attributes
-        self.p_name = p_name
-        self.p_location = p_location
-        # self.p_realtime = p_realtime
-        self.p_notes = p_notes
+    def __init__(self, t_action, t_obj):  # setting attributes in dunder init
+        self.t_action = t_action
+        self.t_obj = t_obj
+        self.task = t_action + ' ' + t_obj
 
-        Project.p_count += 1  # num of projects
+        Tasker.t_count += 1  # num of projects
+        # print("\ninicialised ", self.task)  # PRINT TEST
 
     def nowtime(self):  # method must take in the instance 'self'
         return time.strftime("%Y-%m-%d %H:%M:%S", ts)
 
     def set_duration(self, u_dur):  # u for unique duration. this is setting the class variable to a unique value for instance self
-        self.p_dur = u_dur
-        return self.p_dur
+        self.t_dur = u_dur
+        return self.t_dur
 
     @classmethod
     def set_default_dur(cls, n_dur):  # n for new. set a new default dur
-        cls.p_dur = n_dur
-        return cls.p_dur
+        cls.t_dur = n_dur
+        return cls.t_dur
 
     @classmethod
-    def from_string(cls, proj_str, separator=None):
-        seps = ["-", ",", "/", ";", ":"]
-        for i in seps:
-            try:
-                p_name, p_location, p_notes = proj_str.split(i)
-                # for i in seps:
-                #     p_name, p_location, p_notes = proj_str.split(i)
+    def from_string(cls, proj_str, sep=None):
+        if sep is None:
 
-            except ValueError:
-                pass
-        try:
-            if p_name:
-                # print p_name
-                # if cls(p_name, p_location, p_notes):
-                return cls(p_name, p_location, p_notes)
-        except UnboundLocalError as e:
-            print("\n******* The sepparator is not in our array ******** ", e)
+            seps = ["-", ",", "/", ";", ":", " "]
+            for i in seps:
+                try:
+                    t_action, t_obj = proj_str.split(i)
+
+                except ValueError:
+                    pass
+            try:
+                if t_action:
+                    # print p_name
+                    return cls(t_action, t_obj)
+            except UnboundLocalError as e:
+                print("\n******* The sepparator is not in our array ******** ", e)
+        else:
+            t_action, t_obj = proj_str.split(sep)
+            return cls(t_action, t_obj)
 
     @staticmethod
     def is_workday(day):
@@ -82,34 +84,73 @@ class Project:
         else:
             return True
 
-# try:
-#      p_name, p_location, p_notes = proj_str.split(i)
-# except Exception as e:
-#     raise e
-# else:
-#     pass
+    # Dunder methods
+    def __repr__(self):
+        return "Tasker('{}', '{}')".format(self.t_action, self.t_obj)
+
+    def __str__(self):
+        return '{} - {}h'.format(self.task, self.t_dur)
+
+    def __add__(self, other):
+        a = self.t_dur + other.t_dur
+        return "{} and {} will take {}h".format(self.task, other.task, a)
 
 
-class Tasks(Project):
-    p_dur = .5
+class Project(Tasker):
+    t_dur = 2
 
-    def __init__(self, p_name, p_location, p_notes, t_diff):  # setting attributes
-        super().__init__(p_name, p_location, p_notes)
-        self.t_diff = t_diff
+    def __init__(self, t_action, t_obj, tasks_li=None):  # setting attributes
+        super().__init__(t_action, t_obj)
+
+        if tasks_li is None:
+            self.tasks_li = []
+        else:
+            self.tasks_li = tasks_li
+
+    def add_task(self, t):
+        if t not in self.tasks_li:
+            self.tasks_li.append(t)
+
+    def delete_task(self, t):
+        if t in self.tasks_li:
+            self.tasks_li.remove(t)
+
+    def print_tasks(self):
+        c = 0
+        for t in self.tasks_li:
+            c += 1
+            print('---> ', c, t.task)
+        print('\n')
+
+    def __repr__(self):
+        return "Project('{}', '{}')".format(self.t_action, self.t_obj)
 
 
-bot_1 = Project("bot", "home", "fun")
-print(bot_1.p_name, bot_1.p_dur)
+bot_1 = Project("build", "a bot")
+# print(bot_1.task, bot_1.t_dur)
+# print(bot_1)
 
-groceries = Tasks("groceries", "Irma or Netto", "no", "high")
-print(groceries.p_name, groceries.p_dur)
+groceries = Tasker("get", "groceries")
+print(groceries.task, groceries.t_dur)
 
-# dishes = Tasks("dishes", "home", "why", "low")
+dishes = Tasker("clean", "dishes")
+print(dishes.task, dishes.t_dur)
 
-# str_bot_2 = 'bot2/desk/cool'
+print(groceries + dishes)
+
+# prj_1 = Project('do', 'something', [dishes])
+# print(prj_1.task)
+# prj_1.print_tasks()
+
+# prj_1.add_task(groceries)
+# prj_1.print_tasks()
+###
+
+# str_bot_2 = 'make bot2'
 # bot_2 = Project.from_string(str_bot_2)
 
-# print bot_2.p_name, bot_2.p_notes
+# # print (bot_2.t_action, bot_2.t_obj)
+# print (bot_2.task)
 
 
 # doesn't work because the sepparator isn't known
